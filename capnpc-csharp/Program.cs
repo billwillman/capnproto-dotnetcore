@@ -17,11 +17,16 @@ namespace CapnpC
 
             Environment.SetEnvironmentVariable(MAGIC_DEBUG_ENVVAR, capnpbin);
 
+            string cmd = $"dotnet {Assembly.GetExecutingAssembly().Location}";
+            string cmdFile = Path.ChangeExtension(capnpbin, ".bat");
+            File.WriteAllText(cmdFile, cmd);
+
             using (var compiler = new Process())
             {
                 var argList = new List<string>();
                 argList.Add("compile");
-                argList.Add($"-o\"{Assembly.GetExecutingAssembly().Location}\""); // Does not yet work - it's a dll...
+                argList.Add($"-o\"{cmdFile}\"");
+                argList.AddRange(args);
 
                 compiler.StartInfo.FileName = "capnp.exe";
                 compiler.StartInfo.Arguments = string.Join(' ', argList);
