@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -69,7 +68,7 @@ namespace Capnp.Rpc
             static readonly ThreadLocal<PendingQuestion> _tailCall = new ThreadLocal<PendingQuestion>();
             static readonly ThreadLocal<bool> _canDeferCalls = new ThreadLocal<bool>();
 
-            ILogger Logger { get; } = Logging.CreateLogger<RpcEndpoint>();
+          //  ILogger Logger { get; } = Logging.CreateLogger<RpcEndpoint>();
 
             readonly RpcEngine _host;
             readonly IEndpoint _tx;
@@ -131,7 +130,7 @@ namespace Capnp.Rpc
                 }
                 catch (System.Exception exception)
                 {
-                    Logger.LogWarning(exception, "Unable to send frame");
+                    //Logger.LogWarning(exception, "Unable to send frame");
                     throw new RpcException("Unable to send frame", exception);
                 }
             }
@@ -206,7 +205,7 @@ namespace Capnp.Rpc
                         }
                         else
                         {
-                            Logger.LogError("Inconsistent export table: Capability with id {0} exists in reverse table only", id);
+                            //Logger.LogError("Inconsistent export table: Capability with id {0} exists in reverse table only", id);
                         }
                     }
                     else
@@ -257,13 +256,13 @@ namespace Capnp.Rpc
                 {
                     if (!_questionTable.TryGetValue(id, out var existingQuestion))
                     {
-                        Logger.LogError("Attempting to delete unknown question ID. Race condition?");
+                        //Logger.LogError("Attempting to delete unknown question ID. Race condition?");
                         return;
                     }
 
                     if (question != existingQuestion)
                     {
-                        Logger.LogError("Found different question under given ID. WTF???");
+                       // Logger.LogError("Found different question under given ID. WTF???");
                         return;
                     }
 
@@ -312,7 +311,7 @@ namespace Capnp.Rpc
                 }
                 else
                 {
-                    Logger.LogWarning("Peer asked for bootstrap capability, but no bootstrap capability was set.");
+                    //Logger.LogWarning("Peer asked for bootstrap capability, but no bootstrap capability was set.");
 
                     ret.which = Return.WHICH.Exception;
                     ret.Exception.Reason = "No bootstrap capability present";
@@ -330,7 +329,7 @@ namespace Capnp.Rpc
 
                 if (!added)
                 {
-                    Logger.LogWarning("Incoming bootstrap request: Peer specified duplicate (not yet released?) answer ID.");
+                    //Logger.LogWarning("Incoming bootstrap request: Peer specified duplicate (not yet released?) answer ID.");
                 }
 
 
@@ -371,7 +370,7 @@ namespace Capnp.Rpc
                     }
                     catch (RpcException exception)
                     {
-                        Logger.LogWarning($"Unable to return call: {exception.InnerException.Message}");
+                        //Logger.LogWarning($"Unable to return call: {exception.InnerException.Message}");
                     }
                 }
 
@@ -389,7 +388,7 @@ namespace Capnp.Rpc
 
                     if (!added)
                     {
-                        Logger.LogWarning("Incoming RPC call: Peer specified duplicate (not yet released?) answer ID.");
+                        //Logger.LogWarning("Incoming RPC call: Peer specified duplicate (not yet released?) answer ID.");
 
                         pendingAnswer.Cancel();
                         pendingAnswer.Dispose();
@@ -530,11 +529,11 @@ namespace Capnp.Rpc
                         break;
 
                     case Call.sendResultsTo.WHICH.ThirdParty:
-                        Logger.LogWarning("Incoming RPC call: Peer requested sending results to 3rd party, which is not (yet) supported.");
+                        //Logger.LogWarning("Incoming RPC call: Peer requested sending results to 3rd party, which is not (yet) supported.");
                         throw new RpcUnimplementedException();
 
                     default:
-                        Logger.LogWarning("Incoming RPC call: Peer requested unknown send-results-to mode.");
+                        //Logger.LogWarning("Incoming RPC call: Peer requested unknown send-results-to mode.");
                         throw new RpcUnimplementedException();
                 }
 
@@ -555,7 +554,7 @@ namespace Capnp.Rpc
                                 }
                                 else
                                 {
-                                    Logger.LogWarning("Incoming RPC call: Peer asked for invalid (already released?) capability ID.");
+                                    //Logger.LogWarning("Incoming RPC call: Peer asked for invalid (already released?) capability ID.");
 
                                     SendAbort($"Requested capability with ID {req.Target.ImportedCap} does not exist.");
                                     return;
@@ -609,7 +608,7 @@ namespace Capnp.Rpc
                                 }
                                 else
                                 {
-                                    Logger.LogWarning("Incoming RPC call: Peer asked for non-existing answer ID.");
+                                    //Logger.LogWarning("Incoming RPC call: Peer asked for non-existing answer ID.");
                                     SendAbort($"Did not find a promised answer for given ID {req.Target.PromisedAnswer.QuestionId}");
                                     return;
                                 }
@@ -617,7 +616,7 @@ namespace Capnp.Rpc
                             break;
 
                         default:
-                            Logger.LogWarning("Incoming RPC call: Peer specified unknown call target.");
+                            //Logger.LogWarning("Incoming RPC call: Peer specified unknown call target.");
 
                             throw new RpcUnimplementedException();
                     }
@@ -639,7 +638,7 @@ namespace Capnp.Rpc
                 {
                     if (!_questionTable.TryGetValue(req.AnswerId, out question))
                     {
-                        Logger.LogWarning("Incoming RPC return: Unknown answer ID.");
+                        //Logger.LogWarning("Incoming RPC return: Unknown answer ID.");
 
                         return;
                     }
@@ -654,8 +653,8 @@ namespace Capnp.Rpc
                         break;
 
                     case Return.WHICH.AcceptFromThirdParty:
-                        Logger.LogWarning(
-                            "Incoming RPC return: Peer requested to accept results from 3rd party, which is not (yet) supported.");
+                        //Logger.LogWarning(
+                        //    "Incoming RPC return: Peer requested to accept results from 3rd party, which is not (yet) supported.");
 
                         throw new RpcUnimplementedException();
 
@@ -711,7 +710,7 @@ namespace Capnp.Rpc
                             }
                             else
                             {
-                                Logger.LogWarning("Incoming RPC return: Peer requested to take results from other question, but specified ID is unknown (already released?)");
+                                //Logger.LogWarning("Incoming RPC return: Peer requested to take results from other question, but specified ID is unknown (already released?)");
                             }
                         }
                         break;
@@ -725,7 +724,7 @@ namespace Capnp.Rpc
             {
                 if (!_importTable.TryGetValue(resolve.PromiseId, out var rcw))
                 {
-                    Logger.LogWarning("Received a resolve message with invalid ID");
+                    //Logger.LogWarning("Received a resolve message with invalid ID");
                     return;
                 }
 
@@ -737,7 +736,7 @@ namespace Capnp.Rpc
 
                 if (!(cap is PromisedCapability resolvableCap))
                 {
-                    Logger.LogWarning("Received a resolve message for a capability which is not a promise");
+                    //Logger.LogWarning("Received a resolve message for a capability which is not a promise");
                     return;
                 }
 
@@ -756,7 +755,7 @@ namespace Capnp.Rpc
                         break;
 
                     default:
-                        Logger.LogWarning("Received a resolve message with unknown category.");
+                        //Logger.LogWarning("Received a resolve message with unknown category.");
                         throw new RpcUnimplementedException();
                 }
             }
@@ -777,7 +776,7 @@ namespace Capnp.Rpc
 
                         if (!_exportTable.TryGetValue(disembargo.Target.ImportedCap, out var cap))
                         {
-                            Logger.LogWarning("Sender loopback request: Peer asked for invalid (already released?) capability ID.");
+                            //Logger.LogWarning("Sender loopback request: Peer asked for invalid (already released?) capability ID.");
 
                             SendAbort("'Disembargo': Invalid capability ID");
                             Dismiss();
@@ -830,7 +829,7 @@ namespace Capnp.Rpc
                                                 }
                                                 else
                                                 {
-                                                    Logger.LogWarning("Sender loopback request: Peer asked for disembargoing an answer which does not resolve back to the sender.");
+                                                    //Logger.LogWarning("Sender loopback request: Peer asked for disembargoing an answer which does not resolve back to the sender.");
 
                                                     SendAbort("'Disembargo': Answer does not resolve back to me");
                                                     Dismiss();
@@ -844,7 +843,7 @@ namespace Capnp.Rpc
                                     }
                                     catch (System.Exception exception)
                                     {
-                                        Logger.LogWarning($"Sender loopback request: Peer asked for disembargoing an answer which either has not yet returned, was canceled, or faulted: {exception.Message}");
+                                        //Logger.LogWarning($"Sender loopback request: Peer asked for disembargoing an answer which either has not yet returned, was canceled, or faulted: {exception.Message}");
 
                                         SendAbort($"'Disembargo' failure: {exception}");
                                         Dismiss();
@@ -854,7 +853,7 @@ namespace Capnp.Rpc
                         }
                         else
                         {
-                            Logger.LogWarning("Sender loopback request: Peer asked for non-existing answer ID.");
+                          //  Logger.LogWarning("Sender loopback request: Peer asked for non-existing answer ID.");
 
                             SendAbort("'Disembargo': Invalid answer ID");
                             Dismiss();
@@ -865,7 +864,7 @@ namespace Capnp.Rpc
                         break;
 
                     default:
-                        Logger.LogWarning("Sender loopback request: Peer specified unknown call target.");
+                        //Logger.LogWarning("Sender loopback request: Peer specified unknown call target.");
 
                         throw new RpcUnimplementedException();
                 }
@@ -894,12 +893,12 @@ namespace Capnp.Rpc
 
                     if (!tcs.TrySetResult(0))
                     {
-                        Logger.LogError("Attempting to grant disembargo failed. Looks like an internal error / race condition.");
+                        //Logger.LogError("Attempting to grant disembargo failed. Looks like an internal error / race condition.");
                     }
                 }
                 else
                 {
-                    Logger.LogWarning("Peer sent receiver loopback with unknown ID");
+                    //Logger.LogWarning("Peer sent receiver loopback with unknown ID");
                 }
             }
 
@@ -967,7 +966,7 @@ namespace Capnp.Rpc
                 }
                 else
                 {
-                    Logger.LogWarning("Peer sent 'finish' message with unknown question ID");
+                    //Logger.LogWarning("Peer sent 'finish' message with unknown question ID");
                 }
             }
 
@@ -995,14 +994,14 @@ namespace Capnp.Rpc
                         }
                         catch (System.Exception exception)
                         {
-                            Logger.LogWarning($"Attempting to release capability with invalid reference count: {exception.Message}");
+                            //Logger.LogWarning($"Attempting to release capability with invalid reference count: {exception.Message}");
                         }
                     }
                 }
 
                 if (!exists)
                 {
-                    Logger.LogWarning("Attempting to release unknown capability ID");
+                    //Logger.LogWarning("Attempting to release unknown capability ID");
                 }
             }
 
@@ -1100,7 +1099,7 @@ namespace Capnp.Rpc
                     switch (msg.which)
                     {
                         case Message.WHICH.Abort:
-                            Logger.LogInformation($"Got 'abort' '{msg.Abort.TheType}' message from peer: {msg.Abort.Reason}");
+                            //Logger.LogInformation($"Got 'abort' '{msg.Abort.TheType}' message from peer: {msg.Abort.Reason}");
                             break;
 
                         case Message.WHICH.Bootstrap:
@@ -1138,13 +1137,13 @@ namespace Capnp.Rpc
                         case Message.WHICH.Accept:
                         case Message.WHICH.Join:
                         case Message.WHICH.Provide:
-                            Logger.LogWarning("Received level-3 message from peer. I don't support that.");
+                            //Logger.LogWarning("Received level-3 message from peer. I don't support that.");
                             throw new RpcUnimplementedException();
 
                         case Message.WHICH.ObsoleteDelete:
                         case Message.WHICH.ObsoleteSave:
                         default:
-                            Logger.LogWarning("Received unknown or unimplemented message from peer");
+                           // Logger.LogWarning("Received unknown or unimplemented message from peer");
                             throw new RpcUnimplementedException();
                     }
                 }
@@ -1160,7 +1159,7 @@ namespace Capnp.Rpc
                 }
                 catch (System.Exception exception)
                 {
-                    Logger.LogError(exception, "Uncaught exception during message processing.");
+                    //Logger.LogError(exception, "Uncaught exception during message processing.");
 
                     // A first intuition might be to send the caught exception message. But this is probably a bad idea:
                     // First, we send implementation specific details of a - maybe internal - error, not very valuable for the
@@ -1241,7 +1240,7 @@ namespace Capnp.Rpc
                             }
                             else
                             {
-                                Logger.LogWarning("Peer refers to receiver-hosted capability which does not exist.");
+                                //Logger.LogWarning("Peer refers to receiver-hosted capability which does not exist.");
                                 return null;
                             }
 
@@ -1273,7 +1272,7 @@ namespace Capnp.Rpc
                             }
                             else
                             {
-                                Logger.LogWarning("Peer refers to pending answer which does not exist.");
+                                //Logger.LogWarning("Peer refers to pending answer which does not exist.");
                                 return null;
                             }
 
@@ -1305,7 +1304,7 @@ namespace Capnp.Rpc
                             }
 
                         default:
-                            Logger.LogWarning("Unknown capability descriptor category");
+                            //Logger.LogWarning("Unknown capability descriptor category");
                             throw new RpcUnimplementedException();
                     }
                 }
@@ -1408,7 +1407,7 @@ namespace Capnp.Rpc
                 }
                 catch (System.Exception exception)
                 {
-                    Logger.LogWarning($"Unable to send 'finish' message: {exception.Message}");
+                    //Logger.LogWarning($"Unable to send 'finish' message: {exception.Message}");
                 }
 
                 // Note: Keep question ID in the table, since a "return" message with either "canceled" or
@@ -1454,7 +1453,7 @@ namespace Capnp.Rpc
                     }
                     catch (RpcException exception)
                     {
-                        Logger.LogWarning($"Unable to release import: {exception.InnerException.Message}");
+                        //Logger.LogWarning($"Unable to release import: {exception.InnerException.Message}");
                     }
                 }
             }

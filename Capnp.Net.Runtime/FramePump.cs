@@ -1,5 +1,4 @@
 ﻿using Capnp.FrameTracing;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,7 +17,7 @@ namespace Capnp
     /// </summary>
     public class FramePump: IDisposable
     {
-        ILogger Logger { get; } = Logging.CreateLogger<FramePump>();
+      //  ILogger Logger { get; } = Logging.CreateLogger<FramePump>();
 
         int _disposing;
         readonly Stream _stream;
@@ -162,11 +161,11 @@ namespace Capnp
             }
             catch (EndOfStreamException)
             {
-                Logger.LogWarning("Encountered End of Stream");
+              //  Logger.LogWarning("Encountered End of Stream");
             }
             catch (InvalidDataException e)
             {
-                Logger.LogWarning(e.Message);
+               // Logger.LogWarning(e.Message);
             }
             catch (ObjectDisposedException)
             {
@@ -177,7 +176,7 @@ namespace Capnp
                 // not worth logging.
                 if (_disposing == 0)
                 {
-                    Logger.LogWarning(exception.Message);
+                  //  Logger.LogWarning(exception.Message);
                 }
             }
             finally

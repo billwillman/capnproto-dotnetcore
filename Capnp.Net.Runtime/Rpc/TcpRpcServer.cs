@@ -1,5 +1,4 @@
 ﻿using Capnp.FrameTracing;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -33,7 +32,7 @@ namespace Capnp.Rpc
     /// </summary>
     public class TcpRpcServer: IDisposable
     {
-        ILogger Logger { get; } = Logging.CreateLogger<TcpRpcServer>();
+     //   ILogger Logger { get; } = Logging.CreateLogger<TcpRpcServer>();
 
         class OutboundTcpEndpoint : IEndpoint
         {
@@ -176,7 +175,7 @@ namespace Capnp.Rpc
             catch (System.Exception exception)
             {
                 // Any other exception might be due to some other problem.
-                Logger.LogError(exception.Message);
+              //  Logger.LogError(exception.Message);
             }
         }
 
@@ -188,19 +187,19 @@ namespace Capnp.Rpc
                 {
                     if (!thread.Join(500))
                     {
-                        Logger.LogError($"Unable to join {thread.Name} within timeout");
+                       // Logger.LogError($"Unable to join {thread.Name} within timeout");
                     }
                     break;
                 }
                 catch (ThreadStateException)
                 {
                     // In rare cases it happens that despite thread.Start() was called, the thread did not actually start yet.
-                    Logger.LogDebug("Waiting for thread to start in order to join it");
+                  //  Logger.LogDebug("Waiting for thread to start in order to join it");
                     Thread.Sleep(100);
                 }
                 catch (System.Exception exception)
                 {
-                    Logger.LogError($"Unable to join {thread.Name}: {exception.Message}");
+                  //  Logger.LogError($"Unable to join {thread.Name}: {exception.Message}");
                     break;
                 }
             }
@@ -269,7 +268,7 @@ namespace Capnp.Rpc
                 }
                 catch (SocketException socketException)
                 {
-                    Logger.LogWarning($"Failed to listen on port {port}, attempt {retry}: {socketException}");
+                   // Logger.LogWarning($"Failed to listen on port {port}, attempt {retry}: {socketException}");
                     Thread.Sleep(10);
                 }
             }

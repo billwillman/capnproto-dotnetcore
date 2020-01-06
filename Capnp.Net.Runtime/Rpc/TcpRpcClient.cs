@@ -1,5 +1,4 @@
 ﻿using Capnp.FrameTracing;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,7 +17,7 @@ namespace Capnp.Rpc
     /// </summary>
     public class TcpRpcClient: IConnection, IDisposable
     {
-        ILogger Logger { get; } = Logging.CreateLogger<TcpRpcClient>();
+       // ILogger Logger { get; } = Logging.CreateLogger<TcpRpcClient>();
 
         class OutboundTcpEndpoint : IEndpoint
         {
@@ -180,17 +179,17 @@ namespace Capnp.Rpc
             {
                 if (!WhenConnected.Wait(500))
                 {
-                    Logger.LogError("Unable to join connection task within timeout");
+                   // Logger.LogError("Unable to join connection task within timeout");
                 }
             }
             catch (System.Exception e)
             {
-                Logger.LogError(e, "Failure disposing client");
+               // Logger.LogError(e, "Failure disposing client");
             }
 
             if (_pumpThread != null && !_pumpThread.Join(500))
             {
-                Logger.LogError("Unable to join pump thread within timeout");
+              //  Logger.LogError("Unable to join pump thread within timeout");
             }
 
             GC.SuppressFinalize(this);
